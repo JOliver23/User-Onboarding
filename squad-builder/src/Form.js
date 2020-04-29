@@ -12,6 +12,8 @@ export default function Form() {
         terms: ""
     });
 
+    const[isButtonDisabled, setIsButtonDisabled] = useState(true)
+
     const [errors, setErrors] = useState({
         name: "",
         email: "",
@@ -21,12 +23,34 @@ export default function Form() {
     });
 
     const formSchema = yup.object().shape({
-        name: yup.string().required("Nameis a req. field"),
+        name: yup.string().required("Name is a req. field"),
         email: yup.string().email("Must be a valid email address").required(),
         terms: yup.boolean().oneOf([true], "Please agree to Terms & Conditions"),
-        password: yup.string().required(),
+        password: yup.string().required("password required"),
         reason: yup.string().required("Fill out squad expectations")
     });
+
+    const validateChange = e => {
+        yup
+            .reach(formSchema, e.target.name)
+            .validate(e.target.value)
+            .then(valid => {
+                setErrors({ ...errors, [e.target.name]: ""  })
+            })
+            .catch(err => {
+                console.log("error: ", err)
+                setErrors({ ...errors, [e.target.name]: err.errors[0]})
+            })
+    };
+
+    console.log("error state: ", errors);
+
+    useEffect(() => {
+        formSchema.isValid(formState).then(valid => {
+            console.log("valid?", valid)
+            setIsButtonDisabled(!valid)
+        })
+    }, [formState])
 
     const formSubmit = e => {
         e.preventDefault();
@@ -34,8 +58,15 @@ export default function Form() {
     };
 
     const valueChange = e => {
-        console.log("input changed!1", e.target.value)
-        setFormState({[e.target.name]:  e.target.value})
+        console.log("input changed!", e.target.value)
+        e.persist()
+        const newFormData = {
+            ...formState,
+            [e.target.name]:
+                e.target.type === "checkbox" ? e.target.checked : e.target.value
+        }
+        validateChange(e)
+        setFormState(newFormData)
     };
 
     return (
@@ -46,7 +77,10 @@ export default function Form() {
                     type="text"
                     id="name"
                     name="name"
+                    onChange={valueChange}
+                    value={formState.name}
                 />
+                {errors.name.length > 0 ? <p className="error">{errors.name}</p> : null}
             </label>
 
             <label htmlFor="email">
@@ -54,7 +88,10 @@ export default function Form() {
                 <input
                     type="email"
                     name="email"
+                    onChange={valueChange}
+                    value={formState.email}
                 />
+                {errors.email.length > 0 ? <p className="error">{errors.email}</p> : null}
             </label>
 
             <label htmlFor="password">
@@ -63,13 +100,18 @@ export default function Form() {
                     type="text"
                     name="password"
                     id="password"
+                    onChange={valueChange}
+                    value={formState.password}
                 />
+                {errors.password.length > 0 ? <p className="error">{errors.password}</p> : null}
             </label>
 
             <label htmlFor="reason">
                 What are you loking for in a squad?
                 <textarea 
                     name="reason"
+                    onChange={valueChange}
+                    value={formState.reason}
                 />
             </label>
 
@@ -77,12 +119,13 @@ export default function Form() {
                 <input 
                     type="checkbox"
                     name="terms"
-                    checked={true}
+                    checked={formState.checked}
+                    onChange={valueChange}
                 />
                 Terms & Conditions
             </label>
 
-            <button type="submit">Submit</button>
+            <button type="submit" disabled={isButtonDisabled}>Submit</button>
         </form>
     );
 }
