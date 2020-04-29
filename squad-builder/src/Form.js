@@ -3,6 +3,7 @@ import * as yup from 'yup';
 import axios from 'axios';
 
 export default function Form() {
+    const [user, setUser] = useState([]);
 
     const [formState, setFormState] = useState({
         name: "",
@@ -54,7 +55,20 @@ export default function Form() {
 
     const formSubmit = e => {
         e.preventDefault();
-        console.log("submit successful")
+        axios
+            .post("https://reqres.in/api/users", formState)
+            .then(response => {
+                console.log("sub sponse", response);
+                setUser(response.data);
+                setFormState({
+                    name: "",
+                    email: "",
+                    password: "",
+                    reason: "",
+                    terms: ""
+                })
+            })
+            .catch(err => console.log("error: ", err.response));
     };
 
     const valueChange = e => {
@@ -70,7 +84,7 @@ export default function Form() {
     };
 
     return (
-        <form>
+        <form onSubmit={formSubmit}>
             <label htmlFor="name">
                 Name
                 <input
@@ -113,6 +127,7 @@ export default function Form() {
                     onChange={valueChange}
                     value={formState.reason}
                 />
+                {errors.reason.length > 0 ? <p className="error">{errors.reason}</p> : null}
             </label>
 
             <label htmlFor="terms">
@@ -126,6 +141,8 @@ export default function Form() {
             </label>
 
             <button type="submit" disabled={isButtonDisabled}>Submit</button>
+
+            <pre>{JSON.stringify(user, null, 2)}</pre>
         </form>
     );
 }
