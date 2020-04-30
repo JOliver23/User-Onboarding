@@ -93,6 +93,7 @@ export default function Form() {
                     name="name"
                     onChange={valueChange}
                     value={formState.name}
+                    data-cy="name"
                 />
                 {errors.name.length > 0 ? <p className="error">{errors.name}</p> : null}
             </label>
