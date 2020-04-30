@@ -19,12 +19,13 @@ describe("test the form inputs and submission", function() {
         .should("have.value", "snifjeknmnshdfhkj")
 
         cy.get('textarea')
-        .type("Reasons for being an awesome tema member")
-        .should("have.value", "Reasons for being an awesome tema member")
+        .type(" ")
+        .should("have.value", " ")
 
         cy.get('[type="checkbox"]')
         .check()
         .should("be.checked")
 
+        cy.get("form").submit()
     });
 })
