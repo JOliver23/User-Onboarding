@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as yup from 'yup';
 import axios from 'axios';
+import { SForm } from './Styles'
 
 export default function Form() {
     const [user, setUser] = useState([]);
@@ -84,7 +85,7 @@ export default function Form() {
     };
 
     return (
-        <form onSubmit={formSubmit}>
+        <SForm onSubmit={formSubmit}>
             <label htmlFor="name">
                 Name
                 <input
@@ -112,7 +113,7 @@ export default function Form() {
             <label htmlFor="password">
                 Password
                 <input 
-                    type="text"
+                    type="password"
                     name="password"
                     id="password"
                     onChange={valueChange}
@@ -144,6 +145,6 @@ export default function Form() {
             <button type="submit" disabled={isButtonDisabled}>Submit</button>
 
             <pre>{JSON.stringify(user, null, 2)}</pre>
-        </form>
+        </SForm>
     );
 }
